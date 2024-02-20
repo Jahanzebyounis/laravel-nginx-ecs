@@ -15,6 +15,6 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker image to ECR...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+      - - printf '[{"name":"laravel","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest > imagedefinitions.json
 artifacts:
-  files:
-    - "**/*"
+  files: imagedefinitions.json
