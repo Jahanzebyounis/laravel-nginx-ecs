@@ -10,7 +10,7 @@ phases:
       - echo Building the Docker image...
       - docker build -t $ECR_REPOSITORY .
       - docker tag $ECR_REPOSITORY:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
-      - cd ././nginx
+      - cd ./nginx
       - docker build -t $ECR_REPOSITORY_NGINX .
       - docker tag $ECR_REPOSITORY_NGINX:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NGINX:latest
   post_build:
