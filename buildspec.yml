@@ -16,4 +16,8 @@ phases:
       - echo Pushing the Docker image to ECR...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
 artifacts:
-  files: imagedefinitions.json
+  files:
+    - '**/*'
+  base-directory: base_dir
+  name: larave-nginx-ecs
+  discard-paths: no
