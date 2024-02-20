@@ -42,7 +42,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY . /var/www
 
 # Set permissions for larvel logs
-RUN chmod -R 777 /var/www/storage/
+RUN chmod -R 775 /var/www/storage/logs
 
 # Change current user to www
 USER root
