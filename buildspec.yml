@@ -8,7 +8,6 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - cd ./nginx
       - docker build -t $ECR_REPOSITORY .
       - docker tag $ECR_REPOSITORY:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
   post_build:
