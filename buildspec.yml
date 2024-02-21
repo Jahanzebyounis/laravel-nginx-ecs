@@ -4,7 +4,7 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - URI=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
-      - ECR_REP_APP=laravel
+      - ECR_REP_APP=dubicars_app
       - ECR_REP_NGINX=nginx
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin $URI
   build:
