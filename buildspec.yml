@@ -24,7 +24,46 @@ phases:
       - docker push $URI/$ECR_REP_NGINX:latest
   post_build:
     commands:
-      - echo Build completed on `date`
-      # - printf '[{"name":"laravel","imageUri":"%s"}]' $URI/$ECR_REPOSITORY:latest > imagedefinitions.json
-# artifacts:
-#   files: imagedefinitions.json
+      - echo Generating task-definition.json...
+      - |
+        echo '{
+          "containerDefinitions": [
+            {
+              "name": "laravel",
+              "image": "'"$URI/'"$ECR_REP_APP"':latest",
+              "cpu": 0,
+              "portMappings": [{"name": "laravel-9000-tcp", "containerPort": 9000, "hostPort": 9000, "protocol": "tcp", "appProtocol": "http"}],
+              "essential": true,
+              "environment": [],
+              "environmentFiles": [],
+              "mountPoints": [],
+              "volumesFrom": [],
+              "ulimits": [],
+              "logConfiguration": {"logDriver": "awslogs", "options": {"awslogs-create-group": "true", "awslogs-group": "/ecs/laravel-nginx", "awslogs-region": "'"ap-southeast-1"'", "awslogs-stream-prefix": "ecs"}, "secretOptions": []}
+            },
+            {
+              "name": "nginx",
+              "image": "'"$URI/$ECR_REP_NGINX:latest",
+              "cpu": 0,
+              "portMappings": [{"name": "nginx-80-tcp", "containerPort": 80, "hostPort": 80, "protocol": "tcp", "appProtocol": "http"}],
+              "essential": true,
+              "environment": [],
+              "environmentFiles": [],
+              "mountPoints": [],
+              "volumesFrom": []
+            }
+          ],
+          "family": "laravel-nginx",
+          "networkMode": "awsvpc",
+          "requiresAttributes": [{"name": "com.amazonaws.ecs.capability.logging-driver.awslogs"}, {"name": "ecs.capability.execution-role-awslogs"}, {"name": "com.amazonaws.ecs.capability.ecr-auth"}, {"name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"}, {"name": "ecs.capability.execution-role-ecr-pull"}, {"name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"}, {"name": "ecs.capability.task-eni"}, {"name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"}],
+          "placementConstraints": [],
+          "compatibilities": ["EC2", "FARGATE"],
+          "requiresCompatibilities": ["FARGATE"],
+          "cpu": "1024",
+          "memory": "3072",
+          "runtimePlatform": {"cpuArchitecture": "X86_64", "operatingSystemFamily": "LINUX"}
+        }' > task-definition.json
+artifacts:
+  files:
+    - task-definition.json
+
