@@ -36,6 +36,6 @@ phases:
       - docker push $REPOSITORY_URI_NGINX:latest
       - docker push $REPOSITORY_URI_NGINX:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"laravel","imageUri":"%s"}]' $REPOSITORY_URI_NGINX:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"nginx","imageUri":"%s"}]' $REPOSITORY_URI_NGINX:$IMAGE_TAG > imagedefinitions.json
 artifacts:
     files: imagedefinitions.json
