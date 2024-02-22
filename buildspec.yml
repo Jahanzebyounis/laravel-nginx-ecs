@@ -1,34 +1,3 @@
-# version: 0.2
-# phases:
-#   pre_build:
-#     commands:
-#       - echo Logging in to Amazon ECR...
-#       - URI=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
-#       - ECR_REP_APP=dubicars_app
-#       - ECR_REP_NGINX=nginx
-#       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin $URI
-#   build:
-#     commands:
-#       - echo Build started on `date`
-#       # Build and push the laravel image
-#       - echo Building the Docker image...
-#       - docker build -t $ECR_REP_APP .
-#       - docker tag $ECR_REP_APP:latest $URI/$ECR_REP_APP:latest
-#       - docker push $URI/$ECR_REP_APP:latest
-
-#       # Build and push the nginx image
-#       - echo Building the Docker image...
-#       - cd ./nginx
-#       - docker build -t $ECR_REP_NGINX .
-#       - docker tag $ECR_REP_NGINX:latest $URI/$ECR_REP_NGINX:latest
-#       - docker push $URI/$ECR_REP_NGINX:latest
-#   post_build:
-#     commands:
-#       - echo Generating task-definition.json...
-# artifacts:
-#   files:
-#     - task-definition.json
-
 version: 0.2
 
 phases:
@@ -37,22 +6,36 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
-      - REPOSITORY_URI=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app
+      - REPOSITORY_URI_APP=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app
+      - REPOSITORY_URI_NGINX=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/nginx
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
       - echo Build started on `date`
-      - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - echo Building Dubicar App Docker image...
+      - docker build -t $REPOSITORY_URI_APP:latest .
+      - docker tag $REPOSITORY_URI_APP:latest $REPOSITORY_URI_APP:$IMAGE_TAG
+
+      - echo Build started on `date`
+      - echo Building Nginx Docker image...
+      - cd ./nginx
+      - docker build -t $REPOSITORY_URI_NGINX:latest .
+      - docker tag $REPOSITORY_URI_NGINX:latest $REPOSITORY_URI_NGINX:$IMAGE_TAG
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:latest
+      - echo Pushing Dubicar App Docker images...
+      - docker push $REPOSITORY_URI_APP:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image REPOSITORY_URI_APP file...
+      - printf '[{"name":"laravel","imageUri":"%s"}]' $REPOSITORY_URI_APP:$IMAGE_TAG > imagedefinitions.json
+
+      - echo Build completed on `date`
+      - echo Pushing Nginx Docker images...
+      - docker push $REPOSITORY_URI_NGINX:latest
+      - docker push $REPOSITORY_URI_NGINX:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"laravel","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"laravel","imageUri":"%s"}]' $REPOSITORY_URI_NGINX:$IMAGE_TAG > imagedefinitions.json
 artifacts:
     files: imagedefinitions.json
