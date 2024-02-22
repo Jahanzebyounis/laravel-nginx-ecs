@@ -27,7 +27,7 @@ phases:
       - echo Build completed on `date`
       - echo Pushing Dubicar App Docker images...
       - docker push $REPOSITORY_URI_APP:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push $REPOSITORY_URI_APP:$IMAGE_TAG
       - echo Writing image REPOSITORY_URI_APP file...
       - printf '[{"name":"laravel","imageUri":"%s"}]' $REPOSITORY_URI_APP:$IMAGE_TAG > imagedefinitions.json
 
