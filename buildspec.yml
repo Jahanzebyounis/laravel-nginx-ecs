@@ -37,7 +37,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
-      - REPOSITORY_URI=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app
+      - REPOSITORY_URI=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/php_base_image
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
@@ -53,6 +53,6 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"dubicars_app","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"php_base_image","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
     files: imagedefinitions.json
