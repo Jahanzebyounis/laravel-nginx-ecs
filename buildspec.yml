@@ -37,7 +37,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
-      - REPOSITORY_URI=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/php_base_image
+      - REPOSITORY_URI=914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
