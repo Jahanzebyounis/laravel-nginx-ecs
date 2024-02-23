@@ -31,14 +31,14 @@ FROM 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/php_base_image:latest
 # RUN docker-php-ext-configure gd --with-external-gd
 # RUN docker-php-ext-install gd
 
+# Copy existing application directory contents
+COPY . /var/www
+
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 # Add user for laravel application
 # RUN groupadd -g 1000 www
 # RUN useradd -u 1000 -ms /bin/bash -g www root
-
-# Copy existing application directory contents
-COPY . /var/www
 
 # Set permissions for larvel logs
 RUN chmod -R 777 /var/www/storage/
