@@ -25,4 +25,4 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"nginx","imageUri":"%s"}]' $REPOSITORY_URI_NGINX:$IMAGE_TAG > imagedefinitions.json
 artifacts:
-    files: dubicars-nginx-pipel/imagedefinitions.json
+    files: imagedefinitions.json
