@@ -49,6 +49,8 @@ USER root
 # Copy existing application directory permissions
 # COPY --chown=www:www . /var/www 
 
+RUN composer install --no-dev --optimize-autoloader
+
 # Expose port 9000 and start server
 EXPOSE 9000
 CMD ["php-fpm"]
