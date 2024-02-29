@@ -16,7 +16,7 @@ jobs:
 
       - name: Login to AWS
         if: success()
-        uses: aws-actions/aws-login@v1
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
@@ -26,7 +26,7 @@ jobs:
         run: |
           docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest .
       
-      - name: Push Image to ECR
+      - name: Push Image to AWS ECR
         if: success()
         run: |
           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest
