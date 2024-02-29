@@ -8,20 +8,35 @@ jobs:
   check_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/github-script@v5
-        with:
-          script:
-            github.event.issue.pull_request && contains(github.event.comment.body, '/test')
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Login to AWS
+      - name: Log github event
+        run: echo "${{ toJSON(github.event) }}"
+
+      - name: GitHub Script
+        uses: actions/github-script@v5
+        with:
+          script: |
+          
+            console.log('Github Event:', github.event)
+
+            if (github.event.pull_request && github.event.comment.body.includes('/test')){
+              console.log('Conditions met!');
+              process.exit(0)
+            } else {
+              console.log('Conditions not met');
+              process.exit(78)
+            }
+
+      - name: Configure AWS credentials
         if: success()
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
-      - name: Run Build Docker build t
+      - name: Run Build Docker build
         if: success()
         run: |
           docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest .
@@ -31,14 +46,14 @@ jobs:
         run: |
           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest
 
-      - name: Notify on failure
-        if: failure()
-        uses: actions/github-script@v5
-        with:
-          script: |
-            github.issues.createComment({
-              issue_number: github.event.issue.number,
-              owner: github.repo.owner,
-              repo: github.repo.repo,
-              body: 'Build or deployment failed!'
-            })
+      # - name: Notify on failure
+      #   if: failure()
+      #   uses: actions/github-script@v5
+      #   with:
+      #     script: |
+      #       github.issues.createComment({
+      #         issue_number: github.event.issue.number,
+      #         owner: github.repo.owner,
+      #         repo: github.repo.repo,
+      #         body: 'Build or deployment failed!'
+      #       })
