@@ -21,7 +21,7 @@ jobs:
           
             console.log('Github Event:', github.event)
 
-            if (github.event.issue.pull_request && github.event.comment.body.includes('/test')){
+            if (github.event.pull_request && github.event.comment.body.includes('/test')){
               console.log('Conditions met!');
               process.exit(0)
             } else {
@@ -46,14 +46,14 @@ jobs:
         run: |
           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest
 
-      - name: Notify on failure
-        if: failure()
-        uses: actions/github-script@v5
-        with:
-          script: |
-            github.issues.createComment({
-              issue_number: github.event.issue.number,
-              owner: github.repo.owner,
-              repo: github.repo.repo,
-              body: 'Build or deployment failed!'
-            })
+      # - name: Notify on failure
+      #   if: failure()
+      #   uses: actions/github-script@v5
+      #   with:
+      #     script: |
+      #       github.issues.createComment({
+      #         issue_number: github.event.issue.number,
+      #         owner: github.repo.owner,
+      #         repo: github.repo.repo,
+      #         body: 'Build or deployment failed!'
+      #       })
