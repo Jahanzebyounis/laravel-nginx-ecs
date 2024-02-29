@@ -6,8 +6,8 @@ on:
       - "created"
 jobs:
   check_and_deploy:
-    if: contains(github.event.comment.html_url, '/pull/') # checks if the comments come from pull request and not from an issue
     runs-on: ubuntu-latest
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/staging')) # checks if the comments come from pull request and not from an issue
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
