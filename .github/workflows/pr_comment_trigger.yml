@@ -14,7 +14,7 @@ jobs:
           script:
             github.event.issue.pull_request && contains(github.event.comment.body, '/test')
 
-      - name: Login to AWS
+      - name: Configure AWS credentials
         if: success()
         uses: aws-actions/configure-aws-credentials@v1
         with:
