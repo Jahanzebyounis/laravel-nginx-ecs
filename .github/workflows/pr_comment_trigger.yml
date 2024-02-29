@@ -11,10 +11,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Log github event
+        run: echo "${{ toJSON(github.event) }}"
+
       - name: GitHub Script
         uses: actions/github-script@v5
         with:
           script: |
+          
+            console.log('Github Event:', github.event)
+
             if (github.event.issue.pull_request && github.event.comment.body.includes('/test')){
               console.log('Conditions met!');
               process.exit(0)
