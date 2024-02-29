@@ -16,8 +16,11 @@ jobs:
         with:
           script: |
             if (github.event.issue.pull_request && github.event.comment.body.includes('/test')){
-              console.log('Condition met!');
-              process.exit()
+              console.log('Conditions met!');
+              process.exit(0)
+            } else {
+              console.log('Conditions not met');
+              process.exit(78)
             }
 
       - name: Configure AWS credentials
