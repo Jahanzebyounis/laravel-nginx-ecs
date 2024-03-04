@@ -8,12 +8,15 @@ jobs:
   Deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/staging') # checks if the comments come from pull request and not from an issue
+
+# checks if the comments come from pull request
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/staging') 
     steps:
       - name: Get PR branch
         uses: xt0rted/pull-request-comment-branch@v1
         id: comment-branch
 
+# Set PR Status as Pending
       - name: Set latest commit status as pending
         uses: myrotvorets/set-commit-status-action@master
         with:
@@ -21,15 +24,11 @@ jobs:
           token: ${{ secrets.TOKEN_GITHUB }}
           status: pending
 
+# Checkout PR Branch
       - name: Checkout PR branch
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
-
-      # - name: Deploy Staging
-      #   if: contains(github.event.comment.body, '/staging')
-      #   run: |
-      #     echo Build for staging
 
 # Configure AWS credentials. build and push docker image to ecr
       - name: Configure AWS credentials
@@ -39,7 +38,7 @@ jobs:
           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: ${{secrets.AWS_REGION}}
-
+          
       - name: Login to ECR
         run: |
           aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
@@ -63,31 +62,14 @@ jobs:
           token: ${{ secrets.TOKEN_GITHUB }}
           status: ${{ job.status }}
 
-      # - name: Add comment to PR # step to add comment to PR
-      #   uses: actions/github-script@v6
-      #   if: always()
-      #   with:
-      #     script: |
-      #       const name = '${{ github.workflow   }}';
-      #       const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
-      #       const success = '${{ job.status }}' === 'success';
-      #       const body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
-
-      #       await github.rest.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: body
-      #       })
-
-      # - name: Notify on failure
-      #   if: failure()
-      #   uses: actions/github-script@v5
-      #   with:
-      #     script: |
-      #       github.issues.createComment({
-      #         issue_number: github.event.issue.number,
-      #         owner: github.repo.owner,
-      #         repo: github.repo.repo,
-      #         body: 'Build or deployment failed!'
-      #       })
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.issues.createComment({
+              issue_number: github.event.issue.number,
+              owner: github.repo.owner,
+              repo: github.repo.repo,
+              body: 'Build or deployment failed!'
+            })

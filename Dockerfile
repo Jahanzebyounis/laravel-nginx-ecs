@@ -1,4 +1,4 @@
-FROM 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/php_base_image:latest
+FROM 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest
 
 # # Copy composer.lock and composer.json file to /var/www
 # COPY composer.lock composer.json /var/www/
@@ -45,9 +45,6 @@ RUN chmod -R 777 /var/www/storage/
 
 # Change current user to www
 USER root
-
-# Copy existing application directory permissions
-# COPY --chown=www:www . /var/www 
 
 # Expose port 9000 and start server
 EXPOSE 9000
