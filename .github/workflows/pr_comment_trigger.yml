@@ -26,15 +26,30 @@ jobs:
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
-      - name: Deploy Staging
-        if: contains(github.event.comment.body, '/staging')   # check the comment if it contains the keywords
-        run: |
-          echo Build for staging
-      - name: Deploye dev
-        if: contains(github.event.comment.body, '/dev')  # check the comment if it contains the keywords
-        run: |
-          echo Build for test stage
+      # - name: Deploy Staging
+      #   if: contains(github.event.comment.body, '/staging')
+      #   run: |
+      #     echo Build for staging
 
+# Configure AWS credentials. build and push docker image to ecr
+      - name: Configure AWS credentials
+        if: success()
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+      - name: Run Build Docker build
+        if: success()
+        run: |
+          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest .
+      
+      - name: Push Image to AWS ECR
+        if: success()
+        run: |
+          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest
+
+# Set latest commit status
       - name: Set latest commit status as ${{ job.status }}
         uses: myrotvorets/set-commit-status-action@master
         if: always()
@@ -59,36 +74,6 @@ jobs:
       #         repo: context.repo.repo,
       #         body: body
       #       })
-
-      # - name: GitHub Script
-      #   uses: actions/github-script@v5
-      #   with:
-      #     script: |
-
-      #       if (github.event.issue.pull_request && github.event.comment.body.includes('/test')){
-      #         console.log('Conditions met!');
-      #         process.exit(0)
-      #       } else {
-      #         console.log('Conditions not met');
-      #         process.exit(78)
-      #       }
-
-      # - name: Configure AWS credentials
-      #   if: success()
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-      #     aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-
-      # - name: Run Build Docker build
-      #   if: success()
-      #   run: |
-      #     docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest .
-      
-      # - name: Push Image to AWS ECR
-      #   if: success()
-      #   run: |
-      #     docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest
 
       # - name: Notify on failure
       #   if: failure()
