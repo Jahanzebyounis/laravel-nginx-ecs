@@ -13,6 +13,13 @@ jobs:
         uses: xt0rted/pull-request-comment-branch@v1
         id: comment-branch
 
+      - name: Set latest commit status as pending
+        uses: myrotvorets/set-commit-status-action@master
+        with:
+          sha: ${{ steps.comment-branch.outputs.head_sha }}
+          token: ${{ secrets.TOKEN_GITHUB }}
+          status: pending
+
       - name: Checkout PR branch
         uses: actions/checkout@v3
         with:
