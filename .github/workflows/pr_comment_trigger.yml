@@ -12,17 +12,17 @@ jobs:
 # checks if the comments come from pull request
     if: github.event.issue.pull_request && contains(github.event.comment.body, '/staging') 
     steps:
-      - name: Get PR branch
-        uses: xt0rted/pull-request-comment-branch@v1
-        id: comment-branch
+      # - name: Get PR branch
+      #   uses: xt0rted/pull-request-comment-branch@v1
+      #   id: comment-branch
 
 # Set PR Status as Pending
-      - name: Set latest commit status as pending
-        uses: myrotvorets/set-commit-status-action@master
-        with:
-          sha: ${{ steps.comment-branch.outputs.head_sha }}
-          token: ${{ secrets.TOKEN_GITHUB }}
-          status: pending
+      # - name: Set latest commit status as pending
+      #   uses: myrotvorets/set-commit-status-action@master
+      #   with:
+      #     sha: ${{ steps.comment-branch.outputs.head_sha }}
+      #     token: ${{ secrets.TOKEN_GITHUB }}
+      #     status: pending
 
 # Checkout PR Branch
       - name: Checkout PR branch
@@ -53,23 +53,23 @@ jobs:
         run: |
           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest
 
-# Set latest commit status
-      - name: Set latest commit status as ${{ job.status }}
-        uses: myrotvorets/set-commit-status-action@master
-        if: always()
-        with:
-          sha: ${{ steps.comment-branch.outputs.head_sha }}
-          token: ${{ secrets.TOKEN_GITHUB }}
-          status: ${{ job.status }}
+# # Set latest commit status
+#       - name: Set latest commit status as ${{ job.status }}
+#         uses: myrotvorets/set-commit-status-action@master
+#         if: always()
+#         with:
+#           sha: ${{ steps.comment-branch.outputs.head_sha }}
+#           token: ${{ secrets.TOKEN_GITHUB }}
+#           status: ${{ job.status }}
 
-      - name: Notify on failure
-        if: failure()
-        uses: actions/github-script@v5
-        with:
-          script: |
-            github.issues.createComment({
-              issue_number: github.event.issue.number,
-              owner: github.repo.owner,
-              repo: github.repo.repo,
-              body: 'Build or deployment failed!'
-            })
+#       - name: Notify on failure
+#         if: failure()
+#         uses: actions/github-script@v5
+#         with:
+#           script: |
+#             github.issues.createComment({
+#               issue_number: github.event.issue.number,
+#               owner: github.repo.owner,
+#               repo: github.repo.repo,
+#               body: 'Build or deployment failed!'
+#             })
