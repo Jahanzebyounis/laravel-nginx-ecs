@@ -26,11 +26,6 @@ jobs:
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
-      - name: Setup Node.js 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
       - name: Deploy Staging
         if: contains(github.event.comment.body, '/staging')   # check the comment if it contains the keywords
         run: |
