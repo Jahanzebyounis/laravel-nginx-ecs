@@ -5,21 +5,60 @@ on:
     types:
       - "created"
 jobs:
-  check_and_deploy:
+  Deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     if: github.event.issue.pull_request && contains(github.event.comment.body, '/staging') # checks if the comments come from pull request and not from an issue
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Get PR branch
+        uses: xt0rted/pull-request-comment-branch@v1
+        id: comment-branch
 
-      - name: Staging
+      - name: Set latest commit status as pending
+        uses: myrotvorets/set-commit-status-action@master
+        with:
+          sha: ${{ steps.comment-branch.outputs.head_sha }}
+          token: ${{ secrets.TOKEN_GITHUB }}
+          status: pending
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.comment-branch.outputs.head_ref }}
+
+      - name: Deploy Staging
         if: contains(github.event.comment.body, '/staging')   # check the comment if it contains the keywords
         run: |
           echo Build for staging
-      - name: Test
-        if: contains(github.event.comment.body, '/test')  # check the comment if it contains the keywords
+      - name: Deploye dev
+        if: contains(github.event.comment.body, '/dev')  # check the comment if it contains the keywords
         run: |
           echo Build for test stage
+
+      - name: Set latest commit status as ${{ job.status }}
+        uses: myrotvorets/set-commit-status-action@master
+        if: always()
+        with:
+          sha: ${{ steps.comment-branch.outputs.head_sha }}
+          token: ${{ secrets.TOKEN_GITHUB }}
+          status: ${{ job.status }}
+
+      - name: Add comment to PR # step to add comment to PR
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const name = '${{ github.workflow   }}';
+            const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            const success = '${{ job.status }}' === 'success';
+            const body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
 
       # - name: GitHub Script
       #   uses: actions/github-script@v5
