@@ -39,12 +39,16 @@ jobs:
           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: ${{secrets.AWS_REGION}}
+          
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
 
       - name: Run Build Docker build
         if: success()
         run: |
           docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest .
-      
+
       - name: Push Image to AWS ECR
         if: success()
         run: |
