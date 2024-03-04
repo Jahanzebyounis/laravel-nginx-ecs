@@ -46,9 +46,6 @@ RUN chmod -R 777 /var/www/storage/
 # Change current user to www
 USER root
 
-# Copy existing application directory permissions
-# COPY --chown=www:www . /var/www 
-
 # Expose port 9000 and start server
 EXPOSE 9000
 CMD ["php-fpm"]
