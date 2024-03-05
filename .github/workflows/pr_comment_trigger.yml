@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
 # checks if the comments come from pull request
-    if: github.event.issue.pull_request #&& contains(github.event.comment.body, '/staging') 
+    if: github.event.issue.pull_request && (contains(github.event.comment.body, '/prod') || contains(github.event.comment.body, '/staging') || contains(github.event.comment.body, '/dev'))
     steps:
       - name: Get PR branch
         uses: xt0rted/pull-request-comment-branch@v1
