@@ -32,7 +32,7 @@ jobs:
 
 # Test deployment based on comments
       - name: Deploy Staging
-        if: contains(github.event.comment.body, '/stage')
+        if: contains(github.event.comment.body, '/staging')
         run: |
           echo staging deployment in progress
 
