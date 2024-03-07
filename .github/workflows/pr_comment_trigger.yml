@@ -77,15 +77,3 @@ jobs:
           sha: ${{ steps.comment-branch.outputs.head_sha }}
           token: ${{ secrets.TOKEN_GITHUB }}
           status: ${{ job.status }}
-
-#       - name: Notify on failure
-#         if: failure()
-#         uses: actions/github-script@v5
-#         with:
-#           script: |
-#             github.issues.createComment({
-#               issue_number: github.event.issue.number,
-#               owner: github.repo.owner,
-#               repo: github.repo.repo,
-#               body: 'Build or deployment failed!'
-#             })
