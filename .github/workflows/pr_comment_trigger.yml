@@ -44,30 +44,20 @@ jobs:
         run: |
           aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
 
-      # - name: Build Application Docker Image
-      #   if: success()
-      #   run: |
-      #     docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
-
-      # - name: Push Application Image to AWS ECR
-      #   if: success()
-      #   run: |
-      #     docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
-
-      # - name: Build nginx Docker Image
-      #   if: success()
-      #   run: |
-      #     docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest ./nginx
-
-      # - name: Push nginx Image to ECR
-      #   if: success()
-      #   run: |
-      #     docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
-          
-
 # Build and Deploy to intended Environment
-      - name: Deploy Development
-        if: contains(github.event.comment.body, '/dev')
+      # - name: Deploy Development
+      #   if: contains(github.event.comment.body, '/dev')
+      #   run: |
+      #     echo "Update AWS ECS Service"
+      #     aws ecs update-service --cluster dubicars-main-cluster --service dubicars-main-app --force-new-deployment
+
+#       - name: Deploy Staging
+#         if: contains(github.event.comment.body, '/staging')
+#         run: |
+#           aws ecs update-service --cluster <staging-cluster> --service <staging-service> --force-new-deployment
+
+      - name: Deploy Production
+        if: contains(github.event.comment.body, '/prod')
         run: |
           echo "Building Application Docker Image"
           docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
@@ -81,18 +71,8 @@ jobs:
           echo "Pushing Nginx Image to AWS ECR"
           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
 
-          
+          echo "Update AWS ECS Service"
           aws ecs update-service --cluster dubicars-main-cluster --service dubicars-main-app --force-new-deployment
-
-#       - name: Deploy Staging
-#         if: contains(github.event.comment.body, '/staging')
-#         run: |
-#           aws ecs update-service --cluster <staging-cluster> --service <staging-service> --force-new-deployment
-
-#       - name: Deploy Production
-#         if: contains(github.event.comment.body, '/prod')
-#         run: |
-#           aws ecs update-service --cluster <Production-cluster> --service <Production-service> --force-new-deployment
 
 # Set latest commit status
       - name: Set latest commit status as ${{ job.status }}
