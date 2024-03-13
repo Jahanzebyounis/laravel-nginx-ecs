@@ -39,37 +39,41 @@ jobs:
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: ${{secrets.AWS_REGION}}
 
-# Build Docker Image and push to ECR
+# Login to AWS ECR
       - name: Login to ECR
         run: |
           aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
 
-      - name: Build Application Docker Image
-        if: success()
-        run: |
-          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
+      # - name: Build Application Docker Image
+      #   if: success()
+      #   run: |
+      #     docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
 
-      - name: Push Application Image to AWS ECR
-        if: success()
-        run: |
-          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
+      # - name: Push Application Image to AWS ECR
+      #   if: success()
+      #   run: |
+      #     docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
 
-      - name: Build nginx Docker Image
-        if: success()
-        run: |
-          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest ./nginx
+      # - name: Build nginx Docker Image
+      #   if: success()
+      #   run: |
+      #     docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest ./nginx
 
-      - name: Push nginx Image to ECR
-        if: success()
-        run: |
-          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
+      # - name: Push nginx Image to ECR
+      #   if: success()
+      #   run: |
+      #     docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
           
 
-# # Deploy to respective Environment
-#       - name: Deploy Development
-#         if: contains(github.event.comment.body, '/dev')
-#         run: |
-#           aws ecs update-service --cluster <Development-cluster> --service <Development-service> --force-new-deployment
+# Build and Deploy to intended Environment
+      - name: Deploy Development
+        if: contains(github.event.comment.body, '/dev')
+        run: |
+          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
+          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
+          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest ./nginx
+          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
+          aws ecs update-service --cluster dubicars-main-cluster --service dubicars-main-app --force-new-deployment
 
 #       - name: Deploy Staging
 #         if: contains(github.event.comment.body, '/staging')
