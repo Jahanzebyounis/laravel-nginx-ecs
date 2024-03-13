@@ -44,15 +44,26 @@ jobs:
         run: |
           aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
 
-      - name: Run Docker build
+      - name: Build Application Docker Image
         if: success()
         run: |
           docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
 
-      - name: Push Image to AWS ECR
+      - name: Push Application Image to AWS ECR
         if: success()
         run: |
           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
+
+      - name: Build nginx Docker Image
+        if: success()
+        run: |
+          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest ./nginx
+
+      - name: Push nginx Image to ECR
+        if: success()
+        run: |
+          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
+          
 
 # # Deploy to respective Environment
 #       - name: Deploy Development
