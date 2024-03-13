@@ -69,10 +69,19 @@ jobs:
       - name: Deploy Development
         if: contains(github.event.comment.body, '/dev')
         run: |
+          echo "Building Application Docker Image"
           docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
+
+          echo "Pushing Application Image to AWS ECR"
           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
+
+          echo "Building Nginx Docker Image"
           docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest ./nginx
+
+          echo "Pushing Nginx Image to AWS ECR"
           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
+
+          
           aws ecs update-service --cluster dubicars-main-cluster --service dubicars-main-app --force-new-deployment
 
 #       - name: Deploy Staging
