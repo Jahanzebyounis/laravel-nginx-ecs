@@ -29,45 +29,46 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
-
-# Test deployment based on comments
-      - name: Deploy Staging
-        if: contains(github.event.comment.body, '/staging')
-        run: |
-          echo staging deployment in progress
-
-      - name: Deploy Development
-        if: contains(github.event.comment.body, '/dev')
-        run: |
-          echo dev deployment in progress
-
-      - name: Deploy Production
-        if: contains(github.event.comment.body, '/prod')
-        run: |
-          echo prod deployment in progress
-
-# # Configure AWS credentials. build and push docker image to ecr
-#       - name: Configure AWS credentials
-#         if: success()
-#         uses: aws-actions/configure-aws-credentials@v1
-#         with:
-#           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-#           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-#           aws-region: ${{secrets.AWS_REGION}}
           
-#       - name: Login to ECR
-#         run: |
-#           aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
+# Configure AWS credentials.
+      - name: Configure AWS credentials
+        if: success()
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{secrets.AWS_REGION}}
 
-#       - name: Run Build Docker build
-#         if: success()
-#         run: |
-#           docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest .
+# Build Docker Image and push to ECR
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
 
-#       - name: Push Image to AWS ECR
-#         if: success()
+      - name: Run Docker build
+        if: success()
+        run: |
+          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
+
+      - name: Push Image to AWS ECR
+        if: success()
+        run: |
+          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
+
+# # Deploy to respective Environment
+#       - name: Deploy Development
+#         if: contains(github.event.comment.body, '/dev')
 #         run: |
-#           docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dubicars_app:latest
+#           aws ecs update-service --cluster <Development-cluster> --service <Development-service> --force-new-deployment
+
+#       - name: Deploy Staging
+#         if: contains(github.event.comment.body, '/staging')
+#         run: |
+#           aws ecs update-service --cluster <staging-cluster> --service <staging-service> --force-new-deployment
+
+#       - name: Deploy Production
+#         if: contains(github.event.comment.body, '/prod')
+#         run: |
+#           aws ecs update-service --cluster <Production-cluster> --service <Production-service> --force-new-deployment
 
 # Set latest commit status
       - name: Set latest commit status as ${{ job.status }}
