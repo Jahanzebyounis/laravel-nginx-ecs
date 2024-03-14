@@ -45,34 +45,46 @@ jobs:
           aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com
 
 # Build and Deploy to intended Environment
-      # - name: Deploy Development
-      #   if: contains(github.event.comment.body, '/dev')
-      #   run: |
+      - name: Deploy Development
+        if: contains(github.event.comment.body, '/dev')
+        run: |
+          echo "Building Application Docker Image"
+          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dev_dubicars_app:latest .
+
+          echo "Pushing Application Image to AWS ECR"
+          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dev_dubicars_app:latest
+
+          echo "Building Nginx Docker Image"
+          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dev_nginx:latest ./nginx
+
+          echo "Pushing Nginx Image to AWS ECR" 
+          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/dev_nginx:latest
+
       #     echo "Update AWS ECS Service"
-      #     aws ecs update-service --cluster dubicars-main-cluster --service dubicars-main-app --force-new-deployment
+      #     aws ecs update-service --cluster dubicars-dev-cluster --service dev-dubicars-app --force-new-deployment
 
 #       - name: Deploy Staging
 #         if: contains(github.event.comment.body, '/staging')
 #         run: |
 #           aws ecs update-service --cluster <staging-cluster> --service <staging-service> --force-new-deployment
 
-      - name: Deploy Production
-        if: contains(github.event.comment.body, '/prod')
-        run: |
-          echo "Building Application Docker Image"
-          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
+      # - name: Deploy Production
+      #   if: contains(github.event.comment.body, '/prod')
+      #   run: |
+      #     echo "Building Application Docker Image"
+      #     docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest .
 
-          echo "Pushing Application Image to AWS ECR"
-          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
+      #     echo "Pushing Application Image to AWS ECR"
+      #     docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_dubicars_app:latest
 
-          echo "Building Nginx Docker Image"
-          docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest ./nginx
+      #     echo "Building Nginx Docker Image"
+      #     docker build -t 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest ./nginx
 
-          echo "Pushing Nginx Image to AWS ECR"
-          docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
+      #     echo "Pushing Nginx Image to AWS ECR" 
+      #     docker push 914684874285.dkr.ecr.ap-southeast-1.amazonaws.com/prod_nginx:latest
 
-          echo "Update AWS ECS Service"
-          aws ecs update-service --cluster dubicars-main-cluster --service dubicars-main-app --force-new-deployment
+      #     echo "Update AWS ECS Service"
+      #     aws ecs update-service --cluster dubicars-main-cluster --service dubicars-main-app --force-new-deployment
 
 # Set latest commit status
       - name: Set latest commit status as ${{ job.status }}
